@@ -3,40 +3,44 @@ package sideseven_spring.service;
 
 import org.springframework.stereotype.Service;
 import sideseven_spring.model.Cliente;
+import sideseven_spring.repository.ClienteRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClienteService {
 
-    private final List<Cliente> clientes = new ArrayList<>();
+    private final ClienteRepository clienteRepository;
 
-    public List<Cliente> listarClientes(){
-        return clientes;
+    public ClienteService(ClienteRepository clienteRepository){
+        this.clienteRepository = clienteRepository;
     }
 
-    public Cliente buscarPorId(int id){
-        return clientes.stream()
-                .filter(c -> c.getId() == id)
-                .findFirst()
-                .orElse(null);
+    public Cliente crearCliente(Cliente cliente) {
+        return clienteRepository.save(cliente);
     }
 
-    public void agregarCliente(Cliente cliente){
-        clientes.add(cliente);
+    public List<Cliente> obtenerTodos(){
+        return clienteRepository.findAll();
     }
 
-    public void actualizarCliente(Cliente clienteNuevo){
-        for (int i = 0; i < clientes.size(); i++) {
-            if (clientes.get(i).getId() == clienteNuevo.getId()) {
-                clientes.set(i, clienteNuevo);
-                return;
-            }
-        }
+    public Optional<Cliente> obtenerPorId(Long id){
+        return clienteRepository.findById(id);
     }
 
-    public void eliminarCliente(int id){
-        clientes.removeIf(c -> c.getId() == id);
+    public Cliente actualizarCliente(Long id, Cliente datos){
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con id: " + id));
+
+                cliente.setNombre(datos.getNombre());
+                cliente.setDireccion(datos.getDireccion());
+
+                return clienteRepository.save(cliente);
     }
-}
+
+    public void eliminarCliente(Long id){
+        clienteRepository.deleteById(id);
+    }
+
+ }

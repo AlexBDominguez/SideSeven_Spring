@@ -2,40 +2,43 @@ package sideseven_spring.service;
 
 import org.springframework.stereotype.Service;
 import sideseven_spring.model.Producto;
+import sideseven_spring.repository.ProductoRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ProductoService {
 
-    private final List<Producto> productos = new ArrayList<>();
+    private final ProductoRepository productoRepository;
 
-    public List<Producto> listarProductos() {
-        return productos;
+    public ProductoService(ProductoRepository productoRepository){
+        this.productoRepository = productoRepository;
     }
 
-    public Producto buscarPorId(int id) {
-        return productos.stream()
-                .filter(p -> p.getId() == id)
-                .findFirst()
-                .orElse(null);
+    public Producto crearProducto(Producto producto){
+        return productoRepository.save(producto);
     }
 
-    public void agregarProducto(Producto producto) {
-        productos.add(producto);
+    public List<Producto> obtenerTodos(){
+        return productoRepository.findAll();
     }
 
-    public void actualizarProducto(Producto productoNuevo){
-        for (int i = 0; i < productos.size(); i++) {
-            if (productos.get(i).getId() == productoNuevo.getId()) {
-                productos.set(i, productoNuevo);
-                return;
-            }
-        }
+    public Producto obtenerPorId(Long id) {
+        return productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
     }
 
-    public void eliminarProducto(int id) {
-        productos.removeIf(p -> p.getId() == id);
+    public Producto actualizarProducto(Long id, Producto datos){
+        Producto producto = obtenerPorId(id);
+        producto.setNombre(datos.getNombre());
+        producto.setCategoria(datos.getCategoria());
+        producto.setPrecio(datos.getPrecio());
+        producto.setStock(datos.getStock());
+        return productoRepository.save(producto);
     }
+
+    public void eliminarProducto(Long id) {
+        productoRepository.deleteById(id);
+    }
+
 }

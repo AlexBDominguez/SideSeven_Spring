@@ -20,27 +20,27 @@ public class ProductoController {
 
     @GetMapping
     public List<Producto> listar() {
-        return productoService.listarProductos();
+        return productoService.obtenerTodos();
     }
 
     @GetMapping("/{id}")
-    public Producto buscar(@PathVariable int id) {
-        return productoService.buscarPorId(id);
+    public Producto buscar(@PathVariable Long id) {
+        return productoService.obtenerPorId(id);
     }
 
     @PostMapping
     public void agregar(@RequestBody Producto producto) {
-        productoService.agregarProducto(producto);
+        productoService.crearProducto(producto);
     }
 
     @PutMapping("/{id}")
-    public void actualizar(@PathVariable int id, @RequestBody Producto producto) {
+    public void actualizar(@PathVariable Long id, @RequestBody Producto producto) {
         producto.setId(id);
-        productoService.actualizarProducto(producto);
+        productoService.actualizarProducto(id, producto);
     }
 
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable int id) {
+    public void eliminar(@PathVariable Long id) {
         productoService.eliminarProducto(id);
     }
 }

@@ -1,7 +1,6 @@
 package sideseven_spring.model;
 
 import jakarta.persistence.*;
-
 import java.util.Date;
 
 @Entity
