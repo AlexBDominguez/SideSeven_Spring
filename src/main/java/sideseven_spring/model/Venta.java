@@ -36,8 +36,18 @@ public class Venta {
     public Long getId() { return id; }
 
     public Cliente getCliente() { return cliente; }
+    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+
     public Producto getProducto() { return producto; }
+    public void setProducto(Producto producto) { this.producto = producto; }
 
     public Date getFecha() { return fecha; }
+    public void setFecha(Date fecha) { this.fecha = fecha; }
+
     public double getTotal() { return total; }
+    public void setTotal(double total) { this.total = total; }
+
+    // Alias para getPrecio() que devuelve el total
+    public double getPrecio() { return total; }
+    public void setPrecio(double precio) { this.total = precio; }
 }

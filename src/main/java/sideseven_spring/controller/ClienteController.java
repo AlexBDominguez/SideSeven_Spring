@@ -18,26 +18,26 @@ public class ClienteController {
 
     @GetMapping
     public List<Cliente> listar(){
-        return clienteService.listarClientes();
+        return clienteService.obtenerTodos();
     }
 
     @GetMapping("/{id}")
-    public Cliente buscar(@PathVariable int id){
-        return clienteService.buscarPorId(id);
+    public Cliente buscar(@PathVariable Long id){
+        return clienteService.obtenerPorId(id).orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
     }
 
     @PostMapping
     public void agregar(@RequestBody Cliente cliente){
-        clienteService.agregarCliente(cliente);
+        clienteService.crearCliente(cliente);
     }
 
     @PutMapping("/{id}")
-    public void actualizar(@PathVariable int id, @RequestBody Cliente cliente) {
+    public void actualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
         cliente.setId(id);
-        clienteService.actualizarCliente(cliente);
+        clienteService.actualizarCliente(id, cliente);
     }
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable int id) {
+    public void eliminar(@PathVariable Long id) {
         clienteService.eliminarCliente(id);
     }
 }
