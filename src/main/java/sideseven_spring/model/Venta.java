@@ -12,16 +12,19 @@ public class Venta {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "cliente_id")
+    @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
     @ManyToOne
-    @JoinColumn(name = "producto_id")
+    @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "fecha")
     private Date fecha;
 
+
+    @Column(name = "total", nullable = false)
     private double total;
 
     public Venta() {}
@@ -50,4 +53,11 @@ public class Venta {
     // Alias para getPrecio() que devuelve el total
     public double getPrecio() { return total; }
     public void setPrecio(double precio) { this.total = precio; }
+
+    @Override
+    public String toString() {
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return String.format("[Venta #%d] Cliente ID: %d | Producto ID: %d | Fecha: %s | Total: %.2f€",
+                id, cliente.getId(), producto.getId(), sdf.format(fecha), total);
+    }
 }
