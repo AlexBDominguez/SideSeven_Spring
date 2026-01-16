@@ -11,11 +11,11 @@ public class Venta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 
@@ -57,7 +57,12 @@ public class Venta {
     @Override
     public String toString() {
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
-        return String.format("[Venta #%d] Cliente ID: %d | Producto ID: %d | Fecha: %s | Total: %.2f€",
-                id, cliente.getId(), producto.getId(), sdf.format(fecha), total);
+
+        String clienteNombre = (cliente != null) ? cliente.getNombre() : "N/A";
+        String productoNombre = (producto != null) ? producto.getNombre() : "N/A";
+        String fechaStr = (fecha != null) ? sdf.format(fecha) : "N/A";
+
+        return String.format("[Venta #%d] Cliente: %s | Producto: %s | Fecha: %s | Total: %.2f€",
+                id, clienteNombre, productoNombre, fechaStr, total);
     }
 }

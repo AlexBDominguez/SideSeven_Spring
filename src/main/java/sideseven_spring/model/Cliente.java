@@ -2,7 +2,6 @@ package sideseven_spring.model;
 
 
 import jakarta.persistence.*;
-import sideseven_spring.controller.VentaController;
 
 import java.util.ArrayList;
 import java.util.List;
