@@ -243,7 +243,7 @@ curl -X POST http://localhost:8082/productos -H "Content-Type: application/json"
 
 ## Autor
 
-Alexandre Barbe
+Alexandre Barbeito Domínguez
 Proyecto: SideSeven Spring Boot
 Fecha: Enero 2026
 
