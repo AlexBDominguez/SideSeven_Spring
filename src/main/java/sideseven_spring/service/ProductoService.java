@@ -20,7 +20,9 @@ public class ProductoService {
     }
 
     public List<Producto> obtenerTodos(){
-        return productoRepository.findAll();
+        return productoRepository.findAll().stream()
+                .filter(Producto::isActivo)
+                .toList();
     }
 
     public Producto obtenerPorId(Long id) {
@@ -38,7 +40,9 @@ public class ProductoService {
     }
 
     public void eliminarProducto(Long id) {
-        productoRepository.deleteById(id);
+        Producto producto = obtenerPorId(id);
+        producto.setActivo(false);
+        productoRepository.save(producto);
     }
 
 }

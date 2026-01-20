@@ -1,5 +1,6 @@
 package sideseven_spring;
 
+import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,7 +13,10 @@ import sideseven_spring.service.VentaService;
 public class MainApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MainApplication.class, args);
+		SpringApplication app = new SpringApplication(MainApplication.class);
+		app.setBannerMode(Banner.Mode.OFF);
+		app.setLogStartupInfo(false);
+		app.run(args);
 	}
 
 	@Bean

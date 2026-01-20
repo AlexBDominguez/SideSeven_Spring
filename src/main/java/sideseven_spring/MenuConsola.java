@@ -25,26 +25,18 @@ public class MenuConsola {
         this.scanner = new Scanner(System.in);
     }
 
-    /**
-     * Pausa la ejecución hasta que el usuario presione Enter
-     */
+
     private void pausar() {
         System.out.print("\nPresione Enter para continuar...");
-        scanner.nextLine();
-    }
-
-    /**
-     * Limpia el buffer del scanner
-     */
-    private void limpiarBuffer() {
-        if (scanner.hasNextLine()) {
+        try {
             scanner.nextLine();
+        } catch (Exception e) {
+            // Ignorar excepciones
         }
     }
 
-    /**
-     * Trunca un texto a la longitud máxima especificada, agregando "..." si es necesario
-     */
+
+    // Para truncar el texto y que no desborde en la consola
     private String truncar(String texto, int longitudMaxima) {
         if (texto == null) return "";
         if (texto.length() <= longitudMaxima) return texto;
@@ -56,7 +48,7 @@ public class MenuConsola {
 
         System.out.println("\n╔═══════════════════════════════════════════════════╗");
         System.out.println("║   SISTEMA DE GESTIÓN - SIDESEVEN SPRING BOOT      ║");
-        System.out.println("╚═══════════════════════════════════════════════════╝\n");
+        System.out.println("╚═══════════════════════════════════════════════════╝");
 
         while (!salir) {
             System.out.println("\n┌─────────────────────────────────────┐");
@@ -85,14 +77,14 @@ public class MenuConsola {
                         break;
                     case 0:
                         salir = true;
-                        System.out.println("\n¡Hasta luego! Cerrando el sistema...");
+                        System.out.println("\n¡Hasta luego! Saliendo del programa...");
                         System.exit(0);
                         break;
                     default:
-                        System.out.println("\n⚠ Opción no válida. Intente de nuevo.");
+                        System.out.println("\nOpción no válida. Intente de nuevo.");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("\n⚠ Error: Debe ingresar un número.");
+                System.out.println("\nError: Debe ingresar un número.");
                 scanner.nextLine(); // Limpiar buffer
             }
         }
@@ -140,17 +132,17 @@ public class MenuConsola {
                         volver = true;
                         break;
                     default:
-                        System.out.println("\n⚠ Opción no válida.");
+                        System.out.println("\nOpción no válida.");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("\n⚠ Error: Debe ingresar un número.");
+                System.out.println("\nError: Debe ingresar un número.");
                 scanner.nextLine();
             }
         }
     }
 
     private void listarProductos() {
-        System.out.println("\n═══════════════════ LISTA DE PRODUCTOS ═══════════════════");
+        System.out.println("\n═══════════════════════════ LISTA DE PRODUCTOS ═════════════════════════");
         List<Producto> productos = productoService.obtenerTodos();
         if (productos.isEmpty()) {
             System.out.println("No hay productos registrados.");
@@ -173,18 +165,20 @@ public class MenuConsola {
         System.out.print("\nIngrese el ID del producto: ");
         try {
             Long id = scanner.nextLong();
-            scanner.nextLine();
+            scanner.nextLine(); // Limpiar buffer
             Producto producto = productoService.obtenerPorId(id);
-            System.out.println("\n✓ Producto encontrado:");
+            System.out.println("\nProducto encontrado:");
             System.out.println("  ID: " + producto.getId());
             System.out.println("  Nombre: " + producto.getNombre());
             System.out.println("  Categoría: " + producto.getCategoria());
             System.out.println("  Precio: €" + producto.getPrecio());
             System.out.println("  Stock: " + producto.getStock());
-            pausar();
+        } catch (InputMismatchException e) {
+            System.out.println("\nError: Debe ingresar un número válido.");
+            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
-            System.out.println("\n✗ Error: " + e.getMessage());
-            scanner.nextLine();
+            System.out.println("\nError: " + e.getMessage());
+        } finally {
             pausar();
         }
     }
@@ -211,19 +205,19 @@ public class MenuConsola {
 
                 Producto producto = new Producto(nombre, categoria, precio, stock);
                 productoService.crearProducto(producto);
-                System.out.println("\n✓ Producto agregado exitosamente.");
+                System.out.println("\nProducto agregado exitosamente.");
 
                 System.out.print("\n¿Desea agregar otro producto? (s/n): ");
                 String respuesta = scanner.nextLine().trim().toLowerCase();
                 continuar = respuesta.equals("s") || respuesta.equals("si") || respuesta.equals("sí");
 
             } catch (InputMismatchException e) {
-                System.out.println("\n✗ Error: Datos inválidos.");
+                System.out.println("\nError: Datos inválidos.");
                 scanner.nextLine();
                 pausar();
                 continuar = false;
             } catch (Exception e) {
-                System.out.println("\n✗ Error al agregar producto: " + e.getMessage());
+                System.out.println("\nError al agregar producto: " + e.getMessage());
                 pausar();
                 continuar = false;
             }
@@ -234,7 +228,7 @@ public class MenuConsola {
         System.out.print("\nIngrese el ID del producto a actualizar: ");
         try {
             Long id = scanner.nextLong();
-            scanner.nextLine();
+            scanner.nextLine(); // Limpiar buffer
 
             Producto productoExistente = productoService.obtenerPorId(id);
             System.out.println("\nProducto actual: " + productoExistente.getNombre());
@@ -258,11 +252,13 @@ public class MenuConsola {
             if (stock >= 0) productoExistente.setStock(stock);
 
             productoService.actualizarProducto(id, productoExistente);
-            System.out.println("\n✓ Producto actualizado exitosamente.");
-            pausar();
+            System.out.println("\nProducto actualizado exitosamente.");
+        } catch (InputMismatchException e) {
+            System.out.println("\nError: Datos inválidos.");
+            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
-            System.out.println("\n✗ Error: " + e.getMessage());
-            scanner.nextLine();
+            System.out.println("\nError: " + e.getMessage());
+        } finally {
             pausar();
         }
     }
@@ -271,13 +267,15 @@ public class MenuConsola {
         System.out.print("\nIngrese el ID del producto a eliminar: ");
         try {
             Long id = scanner.nextLong();
-            scanner.nextLine();
+            scanner.nextLine(); // Limpiar buffer
             productoService.eliminarProducto(id);
-            System.out.println("\n✓ Producto eliminado exitosamente.");
-            pausar();
+            System.out.println("\nProducto eliminado exitosamente.");
+        } catch (InputMismatchException e) {
+            System.out.println("\nError: Debe ingresar un número válido.");
+            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
-            System.out.println("\n✗ Error: " + e.getMessage());
-            scanner.nextLine();
+            System.out.println("\nError: " + e.getMessage());
+        } finally {
             pausar();
         }
     }
@@ -328,17 +326,17 @@ public class MenuConsola {
                         volver = true;
                         break;
                     default:
-                        System.out.println("\n⚠ Opción no válida.");
+                        System.out.println("\nOpción no válida.");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("\n⚠ Error: Debe ingresar un número.");
+                System.out.println("\nError: Debe ingresar un número.");
                 scanner.nextLine();
             }
         }
     }
 
     private void listarClientes() {
-        System.out.println("\n═══════════════════ LISTA DE CLIENTES ═══════════════════");
+        System.out.println("\n═══════════════════════════ LISTA DE PRODUCTOS ═════════════════════════");
         List<Cliente> clientes = clienteService.obtenerTodos();
         if (clientes.isEmpty()) {
             System.out.println("No hay clientes registrados.");
@@ -361,17 +359,19 @@ public class MenuConsola {
         System.out.print("\nIngrese el ID del cliente: ");
         try {
             Long id = scanner.nextLong();
-            scanner.nextLine();
+            scanner.nextLine(); // Limpiar buffer
             Cliente cliente = clienteService.obtenerPorId(id)
                     .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-            System.out.println("\n✓ Cliente encontrado:");
+            System.out.println("\nCliente encontrado:");
             System.out.println("  ID: " + cliente.getId());
             System.out.println("  Nombre: " + cliente.getNombre());
             System.out.println("  Dirección: " + cliente.getDireccion());
-            pausar();
+        } catch (InputMismatchException e) {
+            System.out.println("\nError: Debe ingresar un número válido.");
+            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
-            System.out.println("\n✗ Error: " + e.getMessage());
-            scanner.nextLine();
+            System.out.println("\nError: " + e.getMessage());
+        } finally {
             pausar();
         }
     }
@@ -390,14 +390,14 @@ public class MenuConsola {
 
                 Cliente cliente = new Cliente(nombre, direccion);
                 clienteService.crearCliente(cliente);
-                System.out.println("\n✓ Cliente agregado exitosamente.");
+                System.out.println("\nCliente agregado exitosamente.");
 
                 System.out.print("\n¿Desea agregar otro cliente? (s/n): ");
                 String respuesta = scanner.nextLine().trim().toLowerCase();
                 continuar = respuesta.equals("s") || respuesta.equals("si") || respuesta.equals("sí");
 
             } catch (Exception e) {
-                System.out.println("\n✗ Error al agregar cliente: " + e.getMessage());
+                System.out.println("\nError al agregar cliente: " + e.getMessage());
                 pausar();
                 continuar = false;
             }
@@ -408,7 +408,7 @@ public class MenuConsola {
         System.out.print("\nIngrese el ID del cliente a actualizar: ");
         try {
             Long id = scanner.nextLong();
-            scanner.nextLine();
+            scanner.nextLine(); // Limpiar buffer
 
             Cliente clienteExistente = clienteService.obtenerPorId(id)
                     .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
@@ -423,11 +423,13 @@ public class MenuConsola {
             if (!direccion.isEmpty()) clienteExistente.setDireccion(direccion);
 
             clienteService.actualizarCliente(id, clienteExistente);
-            System.out.println("\n✓ Cliente actualizado exitosamente.");
-            pausar();
+            System.out.println("\nCliente actualizado exitosamente.");
+        } catch (InputMismatchException e) {
+            System.out.println("\nError: Debe ingresar un número válido.");
+            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
-            System.out.println("\n✗ Error: " + e.getMessage());
-            scanner.nextLine();
+            System.out.println("\nError: " + e.getMessage());
+        } finally {
             pausar();
         }
     }
@@ -436,13 +438,15 @@ public class MenuConsola {
         System.out.print("\nIngrese el ID del cliente a eliminar: ");
         try {
             Long id = scanner.nextLong();
-            scanner.nextLine();
+            scanner.nextLine(); // Limpiar buffer
             clienteService.eliminarCliente(id);
-            System.out.println("\n✓ Cliente eliminado exitosamente.");
-            pausar();
+            System.out.println("\nCliente eliminado exitosamente.");
+        } catch (InputMismatchException e) {
+            System.out.println("\nError: Debe ingresar un número válido.");
+            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
-            System.out.println("\n✗ Error: " + e.getMessage());
-            scanner.nextLine();
+            System.out.println("\nError: " + e.getMessage());
+        } finally {
             pausar();
         }
     }
@@ -451,7 +455,7 @@ public class MenuConsola {
         System.out.print("\nIngrese el ID del cliente: ");
         try {
             Long id = scanner.nextLong();
-            scanner.nextLine();
+            scanner.nextLine(); // Limpiar buffer
             Cliente cliente = clienteService.obtenerPorId(id)
                     .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
@@ -460,15 +464,32 @@ public class MenuConsola {
             if (historial.isEmpty()) {
                 System.out.println("Este cliente no tiene compras registradas.");
             } else {
+                System.out.printf("%-5s %-25s %-18s %-10s%n",
+                    "ID", "PRODUCTO", "FECHA", "TOTAL");
+                System.out.println("───────────────────────────────────────────────────────────────");
+
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
+
                 for (Venta venta : historial) {
-                    System.out.println(venta.toString());
+                    String productoNombre = (venta.getProducto() != null)
+                        ? truncar(venta.getProducto().getNombre(), 25)
+                        : "N/A";
+                    String fechaStr = (venta.getFecha() != null)
+                        ? sdf.format(venta.getFecha())
+                        : "N/A";
+
+                    System.out.printf("%-5d %-25s %-18s €%-9.2f%n",
+                            venta.getId(), productoNombre, fechaStr, venta.getTotal());
                     System.out.println(); // Línea en blanco entre ventas
                 }
+                System.out.println("═══════════════════════════════════════════════════════════════");
             }
-            pausar();
+        } catch (InputMismatchException e) {
+            System.out.println("\nError: Debe ingresar un número válido.");
+            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
-            System.out.println("\n✗ Error: " + e.getMessage());
-            scanner.nextLine();
+            System.out.println("\nError: " + e.getMessage());
+        } finally {
             pausar();
         }
     }
@@ -489,8 +510,8 @@ public class MenuConsola {
             System.out.print("Seleccione una opción: ");
 
             try {
-                int opcion = scanner.nextInt();
-                scanner.nextLine();
+                String input = scanner.nextLine();
+                int opcion = Integer.parseInt(input.trim());
 
                 switch (opcion) {
                     case 1:
@@ -503,11 +524,10 @@ public class MenuConsola {
                         volver = true;
                         break;
                     default:
-                        System.out.println("\n⚠ Opción no válida.");
+                        System.out.println("\nOpción no válida.");
                 }
-            } catch (InputMismatchException e) {
-                System.out.println("\n⚠ Error: Debe ingresar un número.");
-                scanner.nextLine();
+            } catch (NumberFormatException e) {
+                System.out.println("\nError: Debe ingresar un número válido.");
             }
         }
     }
@@ -518,30 +538,77 @@ public class MenuConsola {
         while (continuar) {
             System.out.println("\n─── REGISTRAR NUEVA VENTA ───");
             try {
-                // Mostrar clientes disponibles
-                listarClientes();
-                System.out.print("Ingrese el ID del cliente: ");
-                Long clienteId = scanner.nextLong();
-                scanner.nextLine(); // Limpiar buffer
+                // Mostrar clientes disponibles (sin pausa)
+                System.out.println("\n═══════════════════════════ CLIENTES DISPONIBLES ═════════════════════════");
+                List<Cliente> clientes = clienteService.obtenerTodos();
+                if (clientes.isEmpty()) {
+                    System.out.println("No hay clientes registrados.");
+                    break;
+                } else {
+                    System.out.printf("%-5s %-28s %-40s%n", "ID", "NOMBRE", "DIRECCIÓN");
+                    System.out.println("─────────────────────────────────────────────────────────────────────────────");
+                    for (Cliente c : clientes) {
+                        String nombre = truncar(c.getNombre(), 28);
+                        String direccion = truncar(c.getDireccion(), 40);
+                        System.out.printf("%-5d %-28s %-40s%n", c.getId(), nombre, direccion);
+                    }
+                    System.out.println("═════════════════════════════════════════════════════════════════════════════");
+                }
 
-                // Mostrar productos disponibles
-                listarProductos();
-                System.out.print("Ingrese el ID del producto: ");
-                Long productoId = scanner.nextLong();
-                scanner.nextLine(); // Limpiar buffer
+                System.out.print("\nIngrese el ID del cliente: ");
+                String inputCliente = scanner.nextLine();
+                Long clienteId = Long.parseLong(inputCliente.trim());
+
+                // Mostrar productos disponibles (sin pausa)
+                System.out.println("\n═══════════════════════════ PRODUCTOS DISPONIBLES ═════════════════════════");
+                List<Producto> productos = productoService.obtenerTodos();
+                if (productos.isEmpty()) {
+                    System.out.println("No hay productos registrados.");
+                    break;
+                } else {
+                    System.out.printf("%-5s %-25s %-18s %-12s %-10s%n", "ID", "NOMBRE", "CATEGORÍA", "PRECIO", "STOCK");
+                    System.out.println("─────────────────────────────────────────────────────────────────────────");
+                    for (Producto p : productos) {
+                        String nombre = truncar(p.getNombre(), 25);
+                        String categoria = truncar(p.getCategoria(), 18);
+                        System.out.printf("%-5d %-25s %-18s €%-11.2f %-10d%n",
+                                p.getId(), nombre, categoria, p.getPrecio(), p.getStock());
+                    }
+                    System.out.println("═════════════════════════════════════════════════════════════════════════");
+                }
+
+                System.out.print("\nIngrese el ID del producto: ");
+                String inputProducto = scanner.nextLine();
+                Long productoId = Long.parseLong(inputProducto.trim());
 
                 Venta venta = ventaService.registrarVenta(clienteId, productoId);
-                System.out.println("\n✓ Venta registrada exitosamente!");
-                System.out.println("  Total: €" + venta.getTotal());
-                System.out.println("  Fecha: " + venta.getFecha());
+
+                // Mostrar resumen completo
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
+                String clienteNombre = truncar(venta.getCliente().getNombre(), 32);
+                String productoNombre = truncar(venta.getProducto().getNombre(), 31);
+                String totalStr = String.format("%.2f", venta.getTotal());
+                String fechaStr = sdf.format(venta.getFecha());
+
+                System.out.println("\n╔════════════════════════════════════════════════╗");
+                System.out.println("║     VENTA REGISTRADA EXITOSAMENTE              ║");
+                System.out.println("╠════════════════════════════════════════════════╣");
+                System.out.printf("║  Cliente:  %-37s║%n", clienteNombre);
+                System.out.printf("║  Producto: %-37s║%n", productoNombre);
+                System.out.printf("║  Total:    €%-36s║%n", totalStr);
+                System.out.printf("║  Fecha:    %-37s║%n", fechaStr);
+                System.out.println("╚════════════════════════════════════════════════╝");
 
                 System.out.print("\n¿Desea registrar otra venta? (s/n): ");
                 String respuesta = scanner.nextLine().trim().toLowerCase();
                 continuar = respuesta.equals("s") || respuesta.equals("si") || respuesta.equals("sí");
 
+            } catch (NumberFormatException e) {
+                System.out.println("\nError: Debe ingresar un número válido.");
+                pausar();
+                continuar = false;
             } catch (Exception e) {
-                System.out.println("\n✗ Error: " + e.getMessage());
-                scanner.nextLine();
+                System.out.println("\nError: " + e.getMessage());
                 pausar();
                 continuar = false;
             }
@@ -549,17 +616,34 @@ public class MenuConsola {
     }
 
     private void listarVentas() {
-        System.out.println("\n═══════════════════ LISTA DE VENTAS ═══════════════════");
+        System.out.println("\n══════════════════════════════ LISTA DE PRODUCTOS ═══════════════════════════════════════");
         List<Venta> ventas = ventaService.listarVentas();
         if (ventas.isEmpty()) {
             System.out.println("No hay ventas registradas.");
         } else {
+            System.out.printf("%-5s %-25s %-25s %-18s %-10s%n",
+                "ID", "CLIENTE", "PRODUCTO", "FECHA", "TOTAL");
+            System.out.println("─────────────────────────────────────────────────────────────────────────────────────────");
+
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
+
             for (Venta venta : ventas) {
-                System.out.println(venta.toString());
+                String clienteNombre = (venta.getCliente() != null)
+                    ? truncar(venta.getCliente().getNombre(), 25)
+                    : "N/A";
+                String productoNombre = (venta.getProducto() != null)
+                    ? truncar(venta.getProducto().getNombre(), 25)
+                    : "N/A";
+                String fechaStr = (venta.getFecha() != null)
+                    ? sdf.format(venta.getFecha())
+                    : "N/A";
+
+                System.out.printf("%-5d %-25s %-25s %-18s €%-9.2f%n",
+                        venta.getId(), clienteNombre, productoNombre, fechaStr, venta.getTotal());
                 System.out.println(); // Línea en blanco entre ventas
             }
         }
-        System.out.println("════════════════════════════════════════════════════════");
+        System.out.println("═════════════════════════════════════════════════════════════════════════════════════════");
         pausar();
     }
 }

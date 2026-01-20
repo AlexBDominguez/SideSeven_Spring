@@ -16,6 +16,9 @@ public class Producto {
     private double precio;
     private int stock;
 
+    @Column(name = "activo", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean activo = true;
+
     public Producto() {}
 
     public Producto(String nombre, String categoria, double precio, int stock) {
@@ -39,4 +42,7 @@ public class Producto {
 
     public int getStock() { return stock; }
     public void setStock(int stock) { this.stock = stock; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 }

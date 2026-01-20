@@ -17,7 +17,7 @@ public class Cliente{
     private String nombre;
     private String direccion;
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Venta> historialCompras = new ArrayList<>();
 
     public Cliente() {}
