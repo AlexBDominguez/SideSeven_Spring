@@ -17,7 +17,10 @@ public class Cliente{
     private String nombre;
     private String direccion;
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Column(name = "activo", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean activo = true;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<Venta> historialCompras = new ArrayList<>();
 
     public Cliente() {}
@@ -37,6 +40,9 @@ public class Cliente{
     public void setDireccion(String direccion) { this.direccion = direccion; }
 
     public List<Venta> getHistorialCompras() { return historialCompras; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 
     @Override
     public String toString() {

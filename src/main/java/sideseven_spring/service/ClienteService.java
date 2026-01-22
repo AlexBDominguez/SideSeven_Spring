@@ -2,6 +2,7 @@ package sideseven_spring.service;
 
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sideseven_spring.model.Cliente;
 import sideseven_spring.repository.ClienteRepository;
 
@@ -33,12 +34,13 @@ public class ClienteService {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado con id: " + id));
 
-                cliente.setNombre(datos.getNombre());
-                cliente.setDireccion(datos.getDireccion());
+        cliente.setNombre(datos.getNombre());
+        cliente.setDireccion(datos.getDireccion());
 
-                return clienteRepository.save(cliente);
+        return clienteRepository.save(cliente);
     }
 
+    @Transactional
     public void eliminarCliente(Long id){
         clienteRepository.deleteById(id);
     }

@@ -1,6 +1,7 @@
 package sideseven_spring.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sideseven_spring.model.Producto;
 import sideseven_spring.repository.ProductoRepository;
 
@@ -20,9 +21,7 @@ public class ProductoService {
     }
 
     public List<Producto> obtenerTodos(){
-        return productoRepository.findAll().stream()
-                .filter(Producto::isActivo)
-                .toList();
+        return productoRepository.findAll();
     }
 
     public Producto obtenerPorId(Long id) {
@@ -39,10 +38,9 @@ public class ProductoService {
         return productoRepository.save(producto);
     }
 
+    @Transactional
     public void eliminarProducto(Long id) {
-        Producto producto = obtenerPorId(id);
-        producto.setActivo(false);
-        productoRepository.save(producto);
+        productoRepository.deleteById(id);
     }
 
 }

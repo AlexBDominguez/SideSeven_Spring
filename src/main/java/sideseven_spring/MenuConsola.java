@@ -142,6 +142,10 @@ public class MenuConsola {
     }
 
     private void listarProductos() {
+        listarProductos(true);
+    }
+
+    private void listarProductos(boolean conPausa) {
         System.out.println("\n═══════════════════════════ LISTA DE PRODUCTOS ═════════════════════════");
         List<Producto> productos = productoService.obtenerTodos();
         if (productos.isEmpty()) {
@@ -158,24 +162,29 @@ public class MenuConsola {
             }
         }
         System.out.println("═════════════════════════════════════════════════════════════════════════");
-        pausar();
+        if (conPausa) {
+            pausar();
+        }
     }
 
     private void buscarProducto() {
         System.out.print("\nIngrese el ID del producto: ");
         try {
-            Long id = scanner.nextLong();
-            scanner.nextLine(); // Limpiar buffer
+            String input = scanner.nextLine();
+            Long id = Long.parseLong(input.trim());
             Producto producto = productoService.obtenerPorId(id);
-            System.out.println("\nProducto encontrado:");
-            System.out.println("  ID: " + producto.getId());
-            System.out.println("  Nombre: " + producto.getNombre());
-            System.out.println("  Categoría: " + producto.getCategoria());
-            System.out.println("  Precio: €" + producto.getPrecio());
-            System.out.println("  Stock: " + producto.getStock());
-        } catch (InputMismatchException e) {
+
+            System.out.println("\n╔════════════════════════════════════════════╗");
+            System.out.println("║       PRODUCTO ENCONTRADO                  ║");
+            System.out.println("╠════════════════════════════════════════════╣");
+            System.out.println("║  ID: " + producto.getId());
+            System.out.println("║  Nombre: " + producto.getNombre());
+            System.out.println("║  Categoría: " + producto.getCategoria());
+            System.out.println("║  Precio: €" + String.format("%.2f", producto.getPrecio()));
+            System.out.println("║  Stock: " + producto.getStock());
+            System.out.println("╚════════════════════════════════════════════╝");
+        } catch (NumberFormatException e) {
             System.out.println("\nError: Debe ingresar un número válido.");
-            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
             System.out.println("\nError: " + e.getMessage());
         } finally {
@@ -225,10 +234,11 @@ public class MenuConsola {
     }
 
     private void actualizarProducto() {
+        listarProductos(false);
         System.out.print("\nIngrese el ID del producto a actualizar: ");
         try {
-            Long id = scanner.nextLong();
-            scanner.nextLine(); // Limpiar buffer
+            String input = scanner.nextLine();
+            Long id = Long.parseLong(input.trim());
 
             Producto productoExistente = productoService.obtenerPorId(id);
             System.out.println("\nProducto actual: " + productoExistente.getNombre());
@@ -241,21 +251,24 @@ public class MenuConsola {
             String categoria = scanner.nextLine();
             if (!categoria.isEmpty()) productoExistente.setCategoria(categoria);
 
-            System.out.print("Nuevo precio (0 para mantener): ");
-            double precio = scanner.nextDouble();
-            scanner.nextLine(); // Limpiar buffer
-            if (precio > 0) productoExistente.setPrecio(precio);
+            System.out.print("Nuevo precio (Enter para mantener): ");
+            String precioStr = scanner.nextLine();
+            if (!precioStr.isEmpty()) {
+                double precio = Double.parseDouble(precioStr.trim());
+                if (precio > 0) productoExistente.setPrecio(precio);
+            }
 
-            System.out.print("Nuevo stock (-1 para mantener): ");
-            int stock = scanner.nextInt();
-            scanner.nextLine(); // Limpiar buffer
-            if (stock >= 0) productoExistente.setStock(stock);
+            System.out.print("Nuevo stock (Enter para mantener): ");
+            String stockStr = scanner.nextLine();
+            if (!stockStr.isEmpty()) {
+                int stock = Integer.parseInt(stockStr.trim());
+                if (stock >= 0) productoExistente.setStock(stock);
+            }
 
             productoService.actualizarProducto(id, productoExistente);
-            System.out.println("\nProducto actualizado exitosamente.");
-        } catch (InputMismatchException e) {
+            System.out.println("\n✓ Producto actualizado exitosamente.");
+        } catch (NumberFormatException e) {
             System.out.println("\nError: Datos inválidos.");
-            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
             System.out.println("\nError: " + e.getMessage());
         } finally {
@@ -264,15 +277,15 @@ public class MenuConsola {
     }
 
     private void eliminarProducto() {
+        listarProductos(false);
         System.out.print("\nIngrese el ID del producto a eliminar: ");
         try {
-            Long id = scanner.nextLong();
-            scanner.nextLine(); // Limpiar buffer
+            String input = scanner.nextLine();
+            Long id = Long.parseLong(input.trim());
             productoService.eliminarProducto(id);
             System.out.println("\nProducto eliminado exitosamente.");
-        } catch (InputMismatchException e) {
+        } catch (NumberFormatException e) {
             System.out.println("\nError: Debe ingresar un número válido.");
-            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
             System.out.println("\nError: " + e.getMessage());
         } finally {
@@ -336,7 +349,11 @@ public class MenuConsola {
     }
 
     private void listarClientes() {
-        System.out.println("\n═══════════════════════════ LISTA DE PRODUCTOS ═════════════════════════");
+        listarClientes(true);
+    }
+
+    private void listarClientes(boolean conPausa) {
+        System.out.println("\n═══════════════════════════ LISTA DE CLIENTES ═════════════════════════");
         List<Cliente> clientes = clienteService.obtenerTodos();
         if (clientes.isEmpty()) {
             System.out.println("No hay clientes registrados.");
@@ -352,23 +369,28 @@ public class MenuConsola {
             }
         }
         System.out.println("═════════════════════════════════════════════════════════════════════════════");
-        pausar();
+        if (conPausa) {
+            pausar();
+        }
     }
 
     private void buscarCliente() {
         System.out.print("\nIngrese el ID del cliente: ");
         try {
-            Long id = scanner.nextLong();
-            scanner.nextLine(); // Limpiar buffer
+            String input = scanner.nextLine();
+            Long id = Long.parseLong(input.trim());
             Cliente cliente = clienteService.obtenerPorId(id)
                     .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-            System.out.println("\nCliente encontrado:");
-            System.out.println("  ID: " + cliente.getId());
-            System.out.println("  Nombre: " + cliente.getNombre());
-            System.out.println("  Dirección: " + cliente.getDireccion());
-        } catch (InputMismatchException e) {
+
+            System.out.println("\n╔════════════════════════════════════════════╗");
+            System.out.println("║       CLIENTE ENCONTRADO                   ║");
+            System.out.println("╠════════════════════════════════════════════╣");
+            System.out.println("║  ID: " + cliente.getId());
+            System.out.println("║  Nombre: " + cliente.getNombre());
+            System.out.println("║  Dirección: " + cliente.getDireccion());
+            System.out.println("╚════════════════════════════════════════════╝");
+        } catch (NumberFormatException e) {
             System.out.println("\nError: Debe ingresar un número válido.");
-            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
             System.out.println("\nError: " + e.getMessage());
         } finally {
@@ -405,10 +427,11 @@ public class MenuConsola {
     }
 
     private void actualizarCliente() {
+        listarClientes(false);
         System.out.print("\nIngrese el ID del cliente a actualizar: ");
         try {
-            Long id = scanner.nextLong();
-            scanner.nextLine(); // Limpiar buffer
+            String input = scanner.nextLine();
+            Long id = Long.parseLong(input.trim());
 
             Cliente clienteExistente = clienteService.obtenerPorId(id)
                     .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
@@ -423,10 +446,9 @@ public class MenuConsola {
             if (!direccion.isEmpty()) clienteExistente.setDireccion(direccion);
 
             clienteService.actualizarCliente(id, clienteExistente);
-            System.out.println("\nCliente actualizado exitosamente.");
-        } catch (InputMismatchException e) {
+            System.out.println("\n✓ Cliente actualizado exitosamente.");
+        } catch (NumberFormatException e) {
             System.out.println("\nError: Debe ingresar un número válido.");
-            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
             System.out.println("\nError: " + e.getMessage());
         } finally {
@@ -435,15 +457,15 @@ public class MenuConsola {
     }
 
     private void eliminarCliente() {
+        listarClientes(false);
         System.out.print("\nIngrese el ID del cliente a eliminar: ");
         try {
-            Long id = scanner.nextLong();
-            scanner.nextLine(); // Limpiar buffer
+            String input = scanner.nextLine();
+            Long id = Long.parseLong(input.trim());
             clienteService.eliminarCliente(id);
             System.out.println("\nCliente eliminado exitosamente.");
-        } catch (InputMismatchException e) {
+        } catch (NumberFormatException e) {
             System.out.println("\nError: Debe ingresar un número válido.");
-            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
             System.out.println("\nError: " + e.getMessage());
         } finally {
@@ -452,10 +474,11 @@ public class MenuConsola {
     }
 
     private void verHistorialCompras() {
+        listarClientes(false);
         System.out.print("\nIngrese el ID del cliente: ");
         try {
-            Long id = scanner.nextLong();
-            scanner.nextLine(); // Limpiar buffer
+            String input = scanner.nextLine();
+            Long id = Long.parseLong(input.trim());
             Cliente cliente = clienteService.obtenerPorId(id)
                     .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
@@ -484,9 +507,8 @@ public class MenuConsola {
                 }
                 System.out.println("═══════════════════════════════════════════════════════════════");
             }
-        } catch (InputMismatchException e) {
+        } catch (NumberFormatException e) {
             System.out.println("\nError: Debe ingresar un número válido.");
-            scanner.nextLine(); // Limpiar buffer
         } catch (Exception e) {
             System.out.println("\nError: " + e.getMessage());
         } finally {
