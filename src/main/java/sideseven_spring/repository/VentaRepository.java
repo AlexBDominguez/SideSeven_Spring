@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 public interface VentaRepository extends JpaRepository<Venta, Long> {
-    List<Venta>findByClienteId(Long clienteId);
-    List<Venta>findByProductoId(Long productoId);
-    List<Venta>findByFechaBetween(Date inicio, Date fin);
+    List<Venta> findByClienteId(Long clienteId);
+    List<Venta> findByFechaBetween(Date inicio, Date fin);
 }

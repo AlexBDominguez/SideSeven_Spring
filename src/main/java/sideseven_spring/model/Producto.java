@@ -2,8 +2,6 @@ package sideseven_spring.model;
 
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "productos")
@@ -21,8 +19,6 @@ public class Producto {
     @Column(name = "activo", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private boolean activo = true;
 
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Venta> ventas = new ArrayList<>();
 
     public Producto() {}
 

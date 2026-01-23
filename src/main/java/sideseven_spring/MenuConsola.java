@@ -9,6 +9,7 @@ import sideseven_spring.service.VentaService;
 
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class MenuConsola {
@@ -22,7 +23,7 @@ public class MenuConsola {
         this.clienteService = clienteService;
         this.productoService = productoService;
         this.ventaService = ventaService;
-        this.scanner = new Scanner(System.in);
+        this.scanner = new Scanner(System.in).useLocale(Locale.US);
     }
 
 
@@ -176,13 +177,13 @@ public class MenuConsola {
 
             System.out.println("\n╔════════════════════════════════════════════╗");
             System.out.println("║       PRODUCTO ENCONTRADO                  ║");
-            System.out.println("╠════════════════════════════════════════════╣");
-            System.out.println("║  ID: " + producto.getId());
-            System.out.println("║  Nombre: " + producto.getNombre());
-            System.out.println("║  Categoría: " + producto.getCategoria());
-            System.out.println("║  Precio: €" + String.format("%.2f", producto.getPrecio()));
-            System.out.println("║  Stock: " + producto.getStock());
             System.out.println("╚════════════════════════════════════════════╝");
+            System.out.println("  ID: " + producto.getId());
+            System.out.println("  Nombre: " + producto.getNombre());
+            System.out.println("  Categoría: " + producto.getCategoria());
+            System.out.println("  Precio: €" + String.format("%.2f", producto.getPrecio()));
+            System.out.println("  Stock: " + producto.getStock());
+            System.out.println(" ════════════════════════════════════════════ ");
         } catch (NumberFormatException e) {
             System.out.println("\nError: Debe ingresar un número válido.");
         } catch (Exception e) {
@@ -266,7 +267,7 @@ public class MenuConsola {
             }
 
             productoService.actualizarProducto(id, productoExistente);
-            System.out.println("\n✓ Producto actualizado exitosamente.");
+            System.out.println("\nProducto actualizado exitosamente.");
         } catch (NumberFormatException e) {
             System.out.println("\nError: Datos inválidos.");
         } catch (Exception e) {
@@ -384,11 +385,11 @@ public class MenuConsola {
 
             System.out.println("\n╔════════════════════════════════════════════╗");
             System.out.println("║       CLIENTE ENCONTRADO                   ║");
-            System.out.println("╠════════════════════════════════════════════╣");
-            System.out.println("║  ID: " + cliente.getId());
-            System.out.println("║  Nombre: " + cliente.getNombre());
-            System.out.println("║  Dirección: " + cliente.getDireccion());
             System.out.println("╚════════════════════════════════════════════╝");
+            System.out.println("  ID: " + cliente.getId());
+            System.out.println("  Nombre: " + cliente.getNombre());
+            System.out.println("  Dirección: " + cliente.getDireccion());
+            System.out.println(" ════════════════════════════════════════════ ");
         } catch (NumberFormatException e) {
             System.out.println("\nError: Debe ingresar un número válido.");
         } catch (Exception e) {
@@ -482,30 +483,44 @@ public class MenuConsola {
             Cliente cliente = clienteService.obtenerPorId(id)
                     .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
-            System.out.println("\n═══ HISTORIAL DE COMPRAS - " + cliente.getNombre() + " ═══");
+            System.out.println("\n════════════════════════════════════════════════════════════════════════════");
+            System.out.println("  HISTORIAL DE COMPRAS - " + cliente.getNombre());
+            System.out.println("════════════════════════════════════════════════════════════════════════════");
+
             List<Venta> historial = cliente.getHistorialCompras();
             if (historial.isEmpty()) {
                 System.out.println("Este cliente no tiene compras registradas.");
             } else {
-                System.out.printf("%-5s %-25s %-18s %-10s%n",
-                    "ID", "PRODUCTO", "FECHA", "TOTAL");
-                System.out.println("───────────────────────────────────────────────────────────────");
-
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
 
                 for (Venta venta : historial) {
-                    String productoNombre = (venta.getProducto() != null)
-                        ? truncar(venta.getProducto().getNombre(), 25)
-                        : "N/A";
-                    String fechaStr = (venta.getFecha() != null)
-                        ? sdf.format(venta.getFecha())
-                        : "N/A";
+                    System.out.println("\n┌───────────────────────────────────────────────────────────────────┐");
+                    System.out.printf("│ Venta #%-5d                                                     │%n", venta.getId());
+                    System.out.println("├───────────────────────────────────────────────────────────────────┤");
 
-                    System.out.printf("%-5d %-25s %-18s €%-9.2f%n",
-                            venta.getId(), productoNombre, fechaStr, venta.getTotal());
-                    System.out.println(); // Línea en blanco entre ventas
+                    String fechaStr = (venta.getFecha() != null) ? sdf.format(venta.getFecha()) : "N/A";
+                    System.out.printf("│ Fecha: %-58s │%n", fechaStr);
+                    System.out.println("├───────────────────────────────────────────────────────────────────┤");
+                    System.out.println("│ Productos:                                                        │");
+
+                    if (venta.getDetalles() != null && !venta.getDetalles().isEmpty()) {
+                        for (sideseven_spring.model.VentaDetalle detalle : venta.getDetalles()) {
+                            String productoInfo = String.format("%s x%d (€%.2f) = €%.2f",
+                                truncar(detalle.getNombreProducto(), 25),
+                                detalle.getCantidad(),
+                                detalle.getPrecioUnitario(),
+                                detalle.getSubtotal());
+                            System.out.printf("│   - %-62s │%n", productoInfo);
+                        }
+                    } else {
+                        System.out.println("│   (Sin detalles)                                                  │");
+                    }
+
+                    System.out.println("├───────────────────────────────────────────────────────────────────┤");
+                    System.out.printf("│ TOTAL: €%-58.2f │%n", venta.getTotal());
+                    System.out.println("└───────────────────────────────────────────────────────────────────┘");
                 }
-                System.out.println("═══════════════════════════════════════════════════════════════");
+                System.out.println("\n════════════════════════════════════════════════════════════════════════════");
             }
         } catch (NumberFormatException e) {
             System.out.println("\nError: Debe ingresar un número válido.");
@@ -581,7 +596,7 @@ public class MenuConsola {
                 String inputCliente = scanner.nextLine();
                 Long clienteId = Long.parseLong(inputCliente.trim());
 
-                // Mostrar productos disponibles (sin pausa)
+                // Mostrar productos disponibles
                 System.out.println("\n═══════════════════════════ PRODUCTOS DISPONIBLES ═════════════════════════");
                 List<Producto> productos = productoService.obtenerTodos();
                 if (productos.isEmpty()) {
@@ -599,27 +614,55 @@ public class MenuConsola {
                     System.out.println("═════════════════════════════════════════════════════════════════════════");
                 }
 
-                System.out.print("\nIngrese el ID del producto: ");
-                String inputProducto = scanner.nextLine();
-                Long productoId = Long.parseLong(inputProducto.trim());
+                // Recoger productos y cantidades
+                java.util.Map<Long, Integer> productosConCantidades = new java.util.HashMap<>();
+                boolean agregarMasProductos = true;
 
-                Venta venta = ventaService.registrarVenta(clienteId, productoId);
+                while (agregarMasProductos) {
+                    System.out.print("\nIngrese el ID del producto: ");
+                    String inputProducto = scanner.nextLine();
+                    Long productoId = Long.parseLong(inputProducto.trim());
+
+                    System.out.print("Ingrese la cantidad: ");
+                    String inputCantidad = scanner.nextLine();
+                    Integer cantidad = Integer.parseInt(inputCantidad.trim());
+
+                    if (cantidad <= 0) {
+                        System.out.println("La cantidad debe ser mayor a 0.");
+                        continue;
+                    }
+
+                    productosConCantidades.put(productoId, cantidad);
+
+                    System.out.print("\n¿Agregar otro producto a esta venta? (s/n): ");
+                    String respuesta = scanner.nextLine().trim().toLowerCase();
+                    agregarMasProductos = respuesta.equals("s") || respuesta.equals("si") || respuesta.equals("sí");
+                }
+
+                // Registrar la venta con múltiples productos
+                Venta venta = ventaService.registrarVenta(clienteId, productosConCantidades);
 
                 // Mostrar resumen completo
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
-                String clienteNombre = truncar(venta.getCliente().getNombre(), 32);
-                String productoNombre = truncar(venta.getProducto().getNombre(), 31);
+                String clienteNombre = truncar(venta.getNombreCliente(), 32);
                 String totalStr = String.format("%.2f", venta.getTotal());
                 String fechaStr = sdf.format(venta.getFecha());
 
                 System.out.println("\n╔════════════════════════════════════════════════╗");
                 System.out.println("║     VENTA REGISTRADA EXITOSAMENTE              ║");
-                System.out.println("╠════════════════════════════════════════════════╣");
-                System.out.printf("║  Cliente:  %-37s║%n", clienteNombre);
-                System.out.printf("║  Producto: %-37s║%n", productoNombre);
-                System.out.printf("║  Total:    €%-36s║%n", totalStr);
-                System.out.printf("║  Fecha:    %-37s║%n", fechaStr);
                 System.out.println("╚════════════════════════════════════════════════╝");
+                System.out.printf("  Cliente:  %-37s%n", clienteNombre);
+                System.out.printf("  Fecha:    %-37s%n", fechaStr);
+                System.out.println("  Productos:");
+                for (sideseven_spring.model.VentaDetalle detalle : venta.getDetalles()) {
+                    System.out.printf("    - %s x%d (€%.2f c/u) = €%.2f%n",
+                        truncar(detalle.getNombreProducto(), 30),
+                        detalle.getCantidad(),
+                        detalle.getPrecioUnitario(),
+                        detalle.getSubtotal());
+                }
+                System.out.printf("  TOTAL:    €%-36s%n", totalStr);
+                System.out.println(" ════════════════════════════════════════════════ ");
 
                 System.out.print("\n¿Desea registrar otra venta? (s/n): ");
                 String respuesta = scanner.nextLine().trim().toLowerCase();
@@ -638,34 +681,47 @@ public class MenuConsola {
     }
 
     private void listarVentas() {
-        System.out.println("\n══════════════════════════════ LISTA DE PRODUCTOS ═══════════════════════════════════════");
+        System.out.println("\n════════════════════════════ LISTA DE VENTAS ═════════════════════════════════");
         List<Venta> ventas = ventaService.listarVentas();
         if (ventas.isEmpty()) {
             System.out.println("No hay ventas registradas.");
         } else {
-            System.out.printf("%-5s %-25s %-25s %-18s %-10s%n",
-                "ID", "CLIENTE", "PRODUCTO", "FECHA", "TOTAL");
-            System.out.println("─────────────────────────────────────────────────────────────────────────────────────────");
-
             java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
 
             for (Venta venta : ventas) {
-                String clienteNombre = (venta.getCliente() != null)
-                    ? truncar(venta.getCliente().getNombre(), 25)
-                    : "N/A";
-                String productoNombre = (venta.getProducto() != null)
-                    ? truncar(venta.getProducto().getNombre(), 25)
-                    : "N/A";
-                String fechaStr = (venta.getFecha() != null)
-                    ? sdf.format(venta.getFecha())
-                    : "N/A";
+                System.out.println("\n┌─────────────────────────────────────────────────────────────────────────┐");
+                System.out.printf("│ VENTA #%-5d                                                          │%n", venta.getId());
+                System.out.println("├─────────────────────────────────────────────────────────────────────────┤");
 
-                System.out.printf("%-5d %-25s %-25s %-18s €%-9.2f%n",
-                        venta.getId(), clienteNombre, productoNombre, fechaStr, venta.getTotal());
-                System.out.println(); // Línea en blanco entre ventas
+                String clienteNombre = (venta.getNombreCliente() != null)
+                    ? venta.getNombreCliente()
+                    : (venta.getCliente() != null ? venta.getCliente().getNombre() : "N/A");
+                String fechaStr = (venta.getFecha() != null) ? sdf.format(venta.getFecha()) : "N/A";
+
+                System.out.printf("│ Cliente: %-61s │%n", truncar(clienteNombre, 61));
+                System.out.printf("│ Fecha:   %-61s │%n", fechaStr);
+                System.out.println("├─────────────────────────────────────────────────────────────────────────┤");
+                System.out.println("│ PRODUCTOS:                                                              │");
+
+                if (venta.getDetalles() != null && !venta.getDetalles().isEmpty()) {
+                    for (sideseven_spring.model.VentaDetalle detalle : venta.getDetalles()) {
+                        String productoInfo = String.format("%s x%d (€%.2f c/u) = €%.2f",
+                            detalle.getNombreProducto(),
+                            detalle.getCantidad(),
+                            detalle.getPrecioUnitario(),
+                            detalle.getSubtotal());
+                        System.out.printf("│   - %-68s │%n", truncar(productoInfo, 68));
+                    }
+                } else {
+                    System.out.println("│   (Sin detalles)                                                        │");
+                }
+
+                System.out.println("├─────────────────────────────────────────────────────────────────────────┤");
+                System.out.printf("│ TOTAL: €%-64.2f │%n", venta.getTotal());
+                System.out.println("└─────────────────────────────────────────────────────────────────────────┘");
             }
         }
-        System.out.println("═════════════════════════════════════════════════════════════════════════════════════════");
+        System.out.println("\n══════════════════════════════════════════════════════════════════════════════");
         pausar();
     }
 }

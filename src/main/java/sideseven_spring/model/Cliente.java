@@ -20,7 +20,7 @@ public class Cliente{
     @Column(name = "activo", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private boolean activo = true;
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
     private List<Venta> historialCompras = new ArrayList<>();
 
     public Cliente() {}
